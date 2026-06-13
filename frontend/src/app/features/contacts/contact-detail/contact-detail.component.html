@@ -1,0 +1,90 @@
+<div class="detail-header">
+  <button mat-icon-button routerLink="/app/contacts" matTooltip="Back to contacts">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h2>Contact Detail</h2>
+</div>
+
+@if (loading$ | async) {
+  <div class="loading-center">
+    <mat-spinner diameter="48" />
+  </div>
+}
+
+@if (contact$ | async; as contact) {
+  <div class="detail-layout">
+
+    <!-- Info card -->
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="contact-header">
+          <div class="avatar-large">
+            {{ (contact.firstName[0] || '') + (contact.lastName?.[0] || '') | uppercase }}
+          </div>
+          <div>
+            <h2 class="contact-name">{{ contact.firstName }} {{ contact.lastName }}</h2>
+            @if (contact.label) {
+              <span class="label-chip">{{ contact.label }}</span>
+            }
+            @if (contact.companyName) {
+              <p class="company-name">{{ contact.companyName }}</p>
+            }
+          </div>
+          <span class="spacer"></span>
+          <button mat-stroked-button (click)="openEdit(contact)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-stroked-button color="warn" (click)="openDelete(contact)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+
+        <mat-divider />
+
+        <div class="fields">
+          @if (contact.email) {
+            <div class="field">
+              <mat-icon>email</mat-icon>
+              <a [href]="'mailto:' + contact.email">{{ contact.email }}</a>
+            </div>
+          }
+          @if (contact.phone) {
+            <div class="field">
+              <mat-icon>phone</mat-icon>
+              <span>{{ contact.phone }}</span>
+            </div>
+          }
+          @if (contact.ownerName) {
+            <div class="field">
+              <mat-icon>person</mat-icon>
+              <span>Owner: {{ contact.ownerName }}</span>
+            </div>
+          }
+          <div class="field">
+            <mat-icon>schedule</mat-icon>
+            <span>Added {{ contact.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        @if (contact.notes) {
+          <mat-divider />
+          <div class="notes-section">
+            <h4>Notes</h4>
+            <p>{{ contact.notes }}</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Activity timeline card -->
+    <mat-card class="timeline-card">
+      <mat-card-header>
+        <mat-card-title>Activity</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-activity-timeline [activities]="activities" />
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+}

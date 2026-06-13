@@ -1,0 +1,86 @@
+<div class="list-toolbar">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [formControl]="searchControl" placeholder="Search deals…">
+  </mat-form-field>
+</div>
+
+@if (loading$ | async) {
+  <div class="loading-center"><mat-spinner diameter="40" /></div>
+}
+
+<mat-table [dataSource]="(deals$ | async) ?? []" class="deals-table">
+
+  <ng-container matColumnDef="title">
+    <mat-header-cell *matHeaderCellDef>Deal</mat-header-cell>
+    <mat-cell *matCellDef="let deal">
+      <span class="deal-title">{{ deal.title }}</span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="value">
+    <mat-header-cell *matHeaderCellDef>Value</mat-header-cell>
+    <mat-cell *matCellDef="let deal">
+      @if (deal.value != null) {
+        <strong>{{ deal.value | currency:(deal.currency || 'USD'):'symbol':'1.0-0' }}</strong>
+      } @else {
+        <span class="no-value">—</span>
+      }
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="stage">
+    <mat-header-cell *matHeaderCellDef>Stage</mat-header-cell>
+    <mat-cell *matCellDef="let deal">
+      <span class="stage-chip">{{ deal.stageName }}</span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="contact">
+    <mat-header-cell *matHeaderCellDef>Contact</mat-header-cell>
+    <mat-cell *matCellDef="let deal">{{ deal.contactName ?? '—' }}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="closeDate">
+    <mat-header-cell *matHeaderCellDef>Close Date</mat-header-cell>
+    <mat-cell *matCellDef="let deal">
+      {{ deal.closeDate ? (deal.closeDate | date:'mediumDate') : '—' }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="probability">
+    <mat-header-cell *matHeaderCellDef>Prob.</mat-header-cell>
+    <mat-cell *matCellDef="let deal">
+      @if (deal.probability != null) {
+        <span class="prob-badge" [class]="probClass(deal.probability)">{{ deal.probability }}%</span>
+      }
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+    <mat-cell *matCellDef="let deal" class="actions-cell">
+      <button mat-icon-button (click)="openEdit(deal, $event)" matTooltip="Edit">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="openDelete(deal, $event)" matTooltip="Delete">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns" />
+  <mat-row *matRowDef="let deal; columns: displayedColumns;"
+           class="deal-row"
+           (click)="openDeal(deal)" />
+
+</mat-table>
+
+@if ((pagination$ | async); as page) {
+  <mat-paginator
+    [length]="page.total"
+    [pageSize]="page.size"
+    [pageIndex]="page.page"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPage($event)" />
+}

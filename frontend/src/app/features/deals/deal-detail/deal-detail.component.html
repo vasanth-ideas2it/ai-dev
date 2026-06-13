@@ -1,0 +1,131 @@
+<div class="detail-header">
+  <button mat-icon-button routerLink="/app/deals">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h2>Deal Detail</h2>
+</div>
+
+@if (loading$ | async) {
+  <div class="loading-center"><mat-spinner diameter="48" /></div>
+}
+
+@if (deal$ | async; as deal) {
+  <!-- Stage progress bar -->
+  @if (pipelineStages.length > 0) {
+    <div class="stage-stepper">
+      @for (stage of pipelineStages; track stage.id; let i = $index) {
+        <div class="step" [class.active]="stage.id === deal.stageId" [class.done]="i < stageIndex(deal)">
+          <div class="step-bubble">
+            @if (i < stageIndex(deal)) {
+              <mat-icon>check</mat-icon>
+            } @else {
+              <span>{{ i + 1 }}</span>
+            }
+          </div>
+          <span class="step-label">{{ stage.name }}</span>
+          @if (i < pipelineStages.length - 1) {
+            <div class="step-connector"></div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <div class="detail-layout">
+    <!-- Left: Deal info -->
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="deal-header">
+          <div class="deal-icon"><mat-icon>handshake</mat-icon></div>
+          <div class="deal-title-block">
+            <h2 class="deal-title">{{ deal.title }}</h2>
+            <span class="stage-badge">{{ deal.stageName }}</span>
+          </div>
+          <span class="spacer"></span>
+          <button mat-stroked-button (click)="openEdit(deal)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-stroked-button color="warn" (click)="openDelete(deal)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+
+        <mat-divider />
+
+        <div class="fields">
+          @if (deal.value != null) {
+            <div class="field value-field">
+              <mat-icon>attach_money</mat-icon>
+              <span class="deal-value">
+                {{ deal.value | currency:(deal.currency || 'USD'):'symbol':'1.2-2' }}
+              </span>
+            </div>
+          }
+          @if (deal.probability != null) {
+            <div class="field">
+              <mat-icon>percent</mat-icon>
+              <span>{{ deal.probability }}% probability</span>
+            </div>
+          }
+          @if (deal.closeDate) {
+            <div class="field">
+              <mat-icon>event</mat-icon>
+              <span>Closes {{ deal.closeDate | date:'mediumDate' }}</span>
+            </div>
+          }
+          @if (deal.contactName) {
+            <div class="field">
+              <mat-icon>person</mat-icon>
+              <a [routerLink]="['/app/contacts', deal.contactId]">{{ deal.contactName }}</a>
+            </div>
+          }
+          @if (deal.companyName) {
+            <div class="field">
+              <mat-icon>business</mat-icon>
+              <a [routerLink]="['/app/companies', deal.companyId]">{{ deal.companyName }}</a>
+            </div>
+          }
+          @if (deal.ownerName) {
+            <div class="field">
+              <mat-icon>account_circle</mat-icon>
+              <span>{{ deal.ownerName }}</span>
+            </div>
+          }
+          <div class="field">
+            <mat-icon>schedule</mat-icon>
+            <span>Added {{ deal.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <!-- Tasks -->
+        @if (tasks.length > 0) {
+          <mat-divider />
+          <div class="tasks-section">
+            <h4>Tasks</h4>
+            @for (task of tasks; track task.id) {
+              <div class="task-item">
+                <mat-icon [style.color]="taskStatusColor(task.status)">
+                  {{ taskStatusIcon(task.status) }}
+                </mat-icon>
+                <span class="task-title" [class.done]="task.status === 'DONE'">{{ task.title }}</span>
+                @if (task.dueDate) {
+                  <span class="task-due">{{ task.dueDate | date:'MMM d' }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Right: Activity timeline -->
+    <mat-card class="timeline-card">
+      <mat-card-header>
+        <mat-card-title>Activity</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-activity-timeline [activities]="activities" />
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

@@ -1,0 +1,64 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Contact' : 'New Contact' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="contact-form" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>First name *</mat-label>
+        <input matInput formControlName="firstName">
+        @if (form.get('firstName')?.hasError('required') && form.get('firstName')?.touched) {
+          <mat-error>First name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Last name</mat-label>
+        <input matInput formControlName="lastName">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email">
+      @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+        <mat-error>Enter a valid email address</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Phone</mat-label>
+        <input matInput formControlName="phone">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Label</mat-label>
+        <input matInput formControlName="label" placeholder="VIP, Lead…">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Company</mat-label>
+      <mat-select formControlName="companyId">
+        <mat-option value="">— None —</mat-option>
+        @for (company of (companies$ | async) ?? []; track company.id) {
+          <mat-option [value]="company.id">{{ company.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary"
+          form="contact-form" type="submit"
+          [disabled]="form.invalid">
+    {{ isEdit ? 'Save changes' : 'Create contact' }}
+  </button>
+</mat-dialog-actions>

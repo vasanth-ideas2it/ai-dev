@@ -1,0 +1,21 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  h2 { margin: 0; }
+}
+
+.spacer { flex: 1; }
+
+.pipeline-select { width: 200px; margin-bottom: -1.25em; }
+
+.view-toggle { height: 36px; }
+
+.loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}

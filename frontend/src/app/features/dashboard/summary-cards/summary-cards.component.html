@@ -1,0 +1,71 @@
+<div class="cards-grid">
+
+  <mat-card class="stat-card contacts">
+    <mat-card-content>
+      <div class="card-inner">
+        <div class="stat-icon"><mat-icon>person_add</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-label">New Contacts</div>
+          @if (loading) { <mat-spinner diameter="24" /> }
+          @else {
+            <div class="stat-value">{{ summary?.newContactsThisMonth ?? '—' }}</div>
+          }
+          <div class="stat-sub">This month</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card deals">
+    <mat-card-content>
+      <div class="card-inner">
+        <div class="stat-icon"><mat-icon>handshake</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-label">Open Deals</div>
+          @if (loading) { <mat-spinner diameter="24" /> }
+          @else {
+            <div class="stat-value">{{ summary?.openDeals ?? '—' }}</div>
+          }
+          <div class="stat-sub">Active pipeline</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card revenue">
+    <mat-card-content>
+      <div class="card-inner">
+        <div class="stat-icon"><mat-icon>attach_money</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-label">Pipeline Value</div>
+          @if (loading) { <mat-spinner diameter="24" /> }
+          @else {
+            <div class="stat-value">
+              {{ (summary?.totalDealValue ?? 0) | currency:'USD':'symbol':'1.0-0' }}
+            </div>
+          }
+          <div class="stat-sub">Total open deals</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card overdue">
+    <mat-card-content>
+      <div class="card-inner">
+        <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-label">Overdue Tasks</div>
+          @if (loading) { <mat-spinner diameter="24" /> }
+          @else {
+            <div class="stat-value" [class.has-overdue]="(summary?.overdueTasksCount ?? 0) > 0">
+              {{ summary?.overdueTasksCount ?? '—' }}
+            </div>
+          }
+          <div class="stat-sub">Need attention</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>

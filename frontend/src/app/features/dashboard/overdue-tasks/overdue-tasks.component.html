@@ -1,0 +1,54 @@
+<mat-card class="tasks-card">
+  <mat-card-header>
+    <mat-card-title>Overdue Tasks</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="tasks-content">
+
+    @if (loading) {
+      <div class="loading-center"><mat-spinner diameter="36" /></div>
+    } @else if (tasks.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <p>No overdue tasks — great work!</p>
+      </div>
+    } @else {
+      <div class="task-list">
+        @for (task of tasks; track task.id) {
+          <div class="task-item">
+            <button mat-icon-button
+                    color="warn"
+                    class="complete-btn"
+                    matTooltip="Mark complete"
+                    (click)="completeTask.emit(task.id)">
+              <mat-icon>radio_button_unchecked</mat-icon>
+            </button>
+
+            <div class="task-body">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-meta">
+                @if (task.dueDate) {
+                  <span class="overdue-date">
+                    <mat-icon class="meta-icon">event</mat-icon>
+                    Due {{ task.dueDate | date:'MMM d' }}
+                  </span>
+                }
+                @if (task.assigneeName) {
+                  <span class="task-assignee">
+                    <mat-icon class="meta-icon">person</mat-icon>
+                    {{ task.assigneeName }}
+                  </span>
+                }
+                @if (task.dealId) {
+                  <a class="task-link" [routerLink]="['/app/deals', task.dealId]">
+                    <mat-icon class="meta-icon">handshake</mat-icon> Deal
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </mat-card-content>
+</mat-card>

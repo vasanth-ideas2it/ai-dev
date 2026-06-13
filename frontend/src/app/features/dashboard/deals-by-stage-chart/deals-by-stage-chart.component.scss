@@ -1,0 +1,16 @@
+.chart-card { height: 100%; }
+
+.chart-content { padding-top: 8px; }
+
+.chart-wrap {
+  position: relative;
+  height: 260px;
+}
+
+.loading-center, .empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 260px;
+  color: #9e9e9e;
+}
