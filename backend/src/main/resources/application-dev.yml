@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crm_dev
+    username: postgres
+    password: postgres
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  jwt:
+    secret: dev-secret-change-in-production-must-be-at-least-256-bits-long
+  cors:
+    allowed-origin: http://localhost:4200

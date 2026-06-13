@@ -1,0 +1,86 @@
+<div class="list-toolbar">
+  <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+    <mat-label>Search companies</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="Name, industry…">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+  <span class="spacer"></span>
+  <button mat-raised-button color="primary" (click)="openCreate()">
+    <mat-icon>add</mat-icon> Add Company
+  </button>
+</div>
+
+<mat-card class="table-card">
+  @if (loading$ | async) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  <table mat-table [dataSource]="(companies$ | async) ?? []"
+         matSort (matSortChange)="onSort($event)"
+         class="companies-table">
+
+    <ng-container matColumnDef="icon">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row">
+        <div class="co-icon"><mat-icon>business</mat-icon></div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Name</th>
+      <td mat-cell *matCellDef="let row"><strong>{{ row.name }}</strong></td>
+    </ng-container>
+
+    <ng-container matColumnDef="industry">
+      <th mat-header-cell *matHeaderCellDef>Industry</th>
+      <td mat-cell *matCellDef="let row">{{ row.industry }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="website">
+      <th mat-header-cell *matHeaderCellDef>Website</th>
+      <td mat-cell *matCellDef="let row">
+        @if (row.website) {
+          <a [href]="row.website" target="_blank" (click)="$event.stopPropagation()" class="link">
+            {{ row.website }}
+          </a>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+      <th mat-header-cell *matHeaderCellDef>Phone</th>
+      <td mat-cell *matCellDef="let row">{{ row.phone }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions" stickyEnd>
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="actions-cell">
+        <button mat-icon-button matTooltip="Edit" (click)="openEdit($event, row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Delete" color="warn" (click)="openDelete($event, row)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"
+        class="clickable-row" (click)="onRowClick(row)"></tr>
+
+    <tr class="mat-mdc-no-data-row" *matNoDataRow>
+      <td [attr.colspan]="displayedColumns.length" class="no-data">
+        <mat-icon>business</mat-icon>
+        <p>No companies found.</p>
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="(pagination$ | async)?.total ?? 0"
+    [pageSize]="20"
+    [pageSizeOptions]="[10, 20, 50]"
+    showFirstLastButtons
+    (page)="onPage($event)">
+  </mat-paginator>
+</mat-card>

@@ -1,0 +1,88 @@
+@if (loading) {
+  <div class="loading-center"><mat-spinner diameter="48" /></div>
+}
+
+@if (!loading) {
+  <div cdkDropListGroup class="kanban-board">
+    @for (column of kanban; track column.stageId) {
+      <div class="kanban-column">
+
+        <div class="column-header">
+          <div class="column-title">
+            <span class="stage-name">{{ column.stageName }}</span>
+            <span class="deal-count mat-caption">{{ column.deals.length }}</span>
+          </div>
+          <span class="column-total">
+            {{ columnTotal(column.deals) | currency:'USD':'symbol':'1.0-0' }}
+          </span>
+        </div>
+
+        <div
+          cdkDropList
+          [cdkDropListData]="column.deals"
+          (cdkDropListDropped)="onDrop($event, column)"
+          class="column-body">
+
+          @for (deal of column.deals; track deal.id) {
+            <div
+              cdkDrag
+              [cdkDragData]="deal"
+              class="deal-card"
+              (click)="openDeal(deal)">
+
+              <div class="drag-handle" cdkDragHandle>
+                <mat-icon>drag_indicator</mat-icon>
+              </div>
+
+              <div class="card-title">{{ deal.title }}</div>
+
+              @if (deal.value != null) {
+                <div class="card-value">
+                  {{ deal.value | currency:(deal.currency || 'USD'):'symbol':'1.0-0' }}
+                </div>
+              }
+
+              <div class="card-meta">
+                @if (deal.contactName) {
+                  <span class="meta-item">
+                    <mat-icon class="meta-icon">person</mat-icon>
+                    {{ deal.contactName }}
+                  </span>
+                }
+                @if (deal.closeDate) {
+                  <span class="meta-item">
+                    <mat-icon class="meta-icon">event</mat-icon>
+                    {{ deal.closeDate | date:'MMM d' }}
+                  </span>
+                }
+              </div>
+
+              @if (deal.probability != null) {
+                <div class="prob-badge" [class]="probColor(deal.probability)">
+                  {{ deal.probability }}%
+                </div>
+              }
+
+              <div *cdkDragPlaceholder class="drag-placeholder"></div>
+            </div>
+          }
+
+          @if (column.deals.length === 0) {
+            <div class="empty-col">
+              <mat-icon>inbox</mat-icon>
+              <span>No deals</span>
+            </div>
+          }
+
+        </div>
+      </div>
+    }
+
+    @if (kanban.length === 0 && !loading) {
+      <div class="board-empty">
+        <mat-icon>view_kanban</mat-icon>
+        <p>No pipeline stages configured.</p>
+      </div>
+    }
+  </div>
+}

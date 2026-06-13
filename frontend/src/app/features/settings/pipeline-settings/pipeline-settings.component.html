@@ -1,0 +1,109 @@
+<div class="settings-header">
+  <h2>Pipeline Settings</h2>
+</div>
+
+@if (loading$ | async) {
+  <div class="loading-center"><mat-spinner diameter="48" /></div>
+}
+
+@if (saving$ | async) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (pipelines.length > 0 && selectedPipeline) {
+  <div class="settings-layout">
+
+    <!-- Pipeline selector (for multiple pipelines) -->
+    @if (pipelines.length > 1) {
+      <mat-card class="pipeline-list-card">
+        <mat-card-header><mat-card-title>Pipelines</mat-card-title></mat-card-header>
+        <mat-card-content>
+          @for (pipeline of pipelines; track pipeline.id) {
+            <div class="pipeline-item"
+                 [class.selected]="pipeline.id === selectedPipeline.id"
+                 (click)="selectPipeline(pipeline)">
+              <mat-icon>account_tree</mat-icon>
+              {{ pipeline.name }}
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Stage editor -->
+    <mat-card class="stages-card">
+      <mat-card-header>
+        <mat-card-title>{{ selectedPipeline.name }} — Stages</mat-card-title>
+        <mat-card-subtitle>Drag to reorder stages</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div
+          cdkDropList
+          [cdkDropListData]="stages"
+          (cdkDropListDropped)="onDrop($event)"
+          class="stage-list">
+
+          @for (stage of stages; track stage.id || $index; let i = $index) {
+            <div cdkDrag class="stage-row">
+              <div class="drag-handle" cdkDragHandle>
+                <mat-icon>drag_indicator</mat-icon>
+              </div>
+
+              <div class="stage-order">{{ i + 1 }}</div>
+
+              <mat-form-field appearance="outline" class="stage-name-field">
+                <mat-label>Stage name</mat-label>
+                <input matInput
+                       [(ngModel)]="stage.name"
+                       (ngModelChange)="markDirty(i)"
+                       placeholder="Stage name">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="prob-field">
+                <mat-label>Probability %</mat-label>
+                <input matInput
+                       type="number"
+                       min="0"
+                       max="100"
+                       [(ngModel)]="stage.probability"
+                       (ngModelChange)="markDirty(i)">
+              </mat-form-field>
+
+              <div class="color-picker-wrap">
+                <label class="color-label">Color</label>
+                <input type="color"
+                       class="color-input"
+                       [value]="stage.color || '#3f51b5'"
+                       (input)="stage.color = $any($event.target).value; markDirty(i)">
+              </div>
+
+              <button mat-icon-button color="warn" (click)="removeStage(i)" [disabled]="stages.length <= 1">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              <div *cdkDragPlaceholder class="drag-placeholder"></div>
+            </div>
+          }
+
+        </div>
+
+        <div class="stage-actions">
+          <button mat-stroked-button (click)="addStage()">
+            <mat-icon>add</mat-icon> Add Stage
+          </button>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-flat-button
+                color="primary"
+                [disabled]="!hasChanges() || (saving$ | async)"
+                (click)="save()">
+          Save Changes
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+  </div>
+}

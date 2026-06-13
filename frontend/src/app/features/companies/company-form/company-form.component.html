@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Company' : 'New Company' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="company-form" (ngSubmit)="onSubmit()">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Company name *</mat-label>
+      <input matInput formControlName="name">
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Company name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Industry</mat-label>
+        <input matInput formControlName="industry" placeholder="SaaS, Retail…">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Phone</mat-label>
+        <input matInput formControlName="phone">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Website</mat-label>
+      <input matInput formControlName="website" placeholder="https://…">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Address</mat-label>
+      <textarea matInput formControlName="address" rows="2"></textarea>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary"
+          form="company-form" type="submit"
+          [disabled]="form.invalid">
+    {{ isEdit ? 'Save changes' : 'Create company' }}
+  </button>
+</mat-dialog-actions>

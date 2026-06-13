@@ -1,0 +1,47 @@
+<mat-card class="activities-card">
+  <mat-card-header>
+    <mat-card-title>Recent Activity</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="activities-content">
+
+    @if (loading) {
+      <div class="loading-center"><mat-spinner diameter="36" /></div>
+    } @else if (activities.length === 0) {
+      <div class="empty-state">
+        <mat-icon>history</mat-icon>
+        <p>No recent activity</p>
+      </div>
+    } @else {
+      <div class="activity-feed">
+        @for (activity of activities; track activity.id) {
+          <div class="activity-item">
+            <div class="activity-dot" [style.background]="color(activity.type)">
+              <mat-icon>{{ icon(activity.type) }}</mat-icon>
+            </div>
+            <div class="activity-body">
+              <div class="activity-meta">
+                <span class="activity-type">{{ activity.type | titlecase }}</span>
+                <span class="activity-by">by {{ activity.userName }}</span>
+              </div>
+              @if (activity.body) {
+                <div class="activity-text">{{ activity.body }}</div>
+              }
+              @if (activity.contactId) {
+                <a class="activity-link" [routerLink]="['/app/contacts', activity.contactId]">
+                  <mat-icon class="link-icon">person</mat-icon> Contact
+                </a>
+              }
+              @if (activity.dealId) {
+                <a class="activity-link" [routerLink]="['/app/deals', activity.dealId]">
+                  <mat-icon class="link-icon">handshake</mat-icon> Deal
+                </a>
+              }
+            </div>
+            <div class="activity-time">{{ activity.createdAt | date:'MMM d, h:mm a' }}</div>
+          </div>
+        }
+      </div>
+    }
+
+  </mat-card-content>
+</mat-card>

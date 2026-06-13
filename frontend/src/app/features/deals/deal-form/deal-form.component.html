@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Deal' : 'New Deal' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="deal-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Title *</mat-label>
+      <input matInput formControlName="title" placeholder="Deal name">
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline" class="flex-2">
+        <mat-label>Value</mat-label>
+        <input matInput type="number" formControlName="value" placeholder="0">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="currency">
+          @for (c of currencies; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Stage *</mat-label>
+      <mat-select formControlName="stageId" (selectionChange)="onStageChange($event.value)">
+        @for (stage of currentStages; track stage.id) {
+          <mat-option [value]="stage.id">{{ stage.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="prob-row">
+      <span class="prob-label">Probability: {{ form.value.probability }}%</span>
+      <mat-slider min="0" max="100" step="5" class="prob-slider">
+        <input matSliderThumb formControlName="probability">
+      </mat-slider>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Close Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="closeDate">
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+
+    <!-- Contact autocomplete -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contact</mat-label>
+      @if (selectedContactName) {
+        <mat-icon matPrefix>person</mat-icon>
+      }
+      <input matInput
+             formControlName="contactSearch"
+             [placeholder]="selectedContactName || 'Search contacts…'"
+             [matAutocomplete]="contactAuto"
+             (input)="onContactSearch($any($event.target).value)">
+      @if (form.value.contactId) {
+        <button matSuffix mat-icon-button type="button" (click)="onContactCleared()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      <mat-autocomplete #contactAuto (optionSelected)="onContactSelected($event.option.value)">
+        @for (contact of filteredContacts; track contact.id) {
+          <mat-option [value]="contact">
+            {{ contact.firstName }} {{ contact.lastName }}
+            @if (contact.email) { <span class="hint"> · {{ contact.email }}</span> }
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- Company autocomplete -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Company</mat-label>
+      @if (selectedCompanyName) {
+        <mat-icon matPrefix>business</mat-icon>
+      }
+      <input matInput
+             formControlName="companySearch"
+             [placeholder]="selectedCompanyName || 'Search companies…'"
+             [matAutocomplete]="companyAuto"
+             (input)="onCompanySearch($any($event.target).value)">
+      @if (form.value.companyId) {
+        <button matSuffix mat-icon-button type="button" (click)="onCompanyCleared()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      <mat-autocomplete #companyAuto (optionSelected)="onCompanySelected($event.option.value)">
+        @for (company of filteredCompanies; track company.id) {
+          <mat-option [value]="company">{{ company.name }}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="submit()">
+    {{ isEdit ? 'Save Changes' : 'Create Deal' }}
+  </button>
+</mat-dialog-actions>

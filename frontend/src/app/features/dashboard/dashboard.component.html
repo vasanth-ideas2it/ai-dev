@@ -1,0 +1,21 @@
+<div class="dashboard-page">
+  <div class="page-header">
+    <h2>Dashboard</h2>
+  </div>
+
+  <!-- Row 1: Summary cards -->
+  <app-summary-cards [summary]="summary" [loading]="loading" />
+
+  <!-- Row 2: Charts side-by-side -->
+  <div class="chart-row">
+    <app-deals-by-stage-chart [stages]="dealsByStage" [loading]="loading" />
+    <app-revenue-forecast-chart [forecast]="forecast" [loading]="loading" />
+  </div>
+
+  <!-- Row 3: Activities + Tasks -->
+  <div class="bottom-row">
+    <app-recent-activities [activities]="activities" [loading]="loading" />
+    <app-overdue-tasks [tasks]="overdueTasks" [loading]="loading"
+                       (completeTask)="onCompleteTask($event)" />
+  </div>
+</div>

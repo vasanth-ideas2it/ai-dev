@@ -1,0 +1,73 @@
+<h2 mat-dialog-title>Import Contacts from CSV</h2>
+
+<mat-dialog-content>
+
+  @if (!result) {
+    <div class="drop-zone"
+         [class.drag-over]="isDragOver"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave()"
+         (drop)="onDrop($event)"
+         (click)="fileInput.click()">
+      <mat-icon class="upload-icon">upload_file</mat-icon>
+      @if (selectedFile) {
+        <p class="file-name">{{ selectedFile.name }}</p>
+        <p class="hint">Click to change file</p>
+      } @else {
+        <p>Drag & drop a CSV file here, or <strong>click to browse</strong></p>
+        <p class="hint">Required columns: firstName (others optional)</p>
+      }
+    </div>
+    <input #fileInput type="file" accept=".csv" style="display:none" (change)="onFileSelected($event)">
+
+    @if (error) {
+      <div class="error-banner">
+        <mat-icon>error_outline</mat-icon>
+        {{ error }}
+      </div>
+    }
+
+    @if (uploading) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+  }
+
+  @if (result) {
+    <div class="result">
+      <mat-icon class="result-icon" [class.success]="result.failed === 0">
+        {{ result.failed === 0 ? 'check_circle' : 'warning' }}
+      </mat-icon>
+      <h3>Import complete</h3>
+      <div class="stats">
+        <span>Total: <strong>{{ result.total }}</strong></span>
+        <span>Imported: <strong>{{ result.imported }}</strong></span>
+        <span>Failed: <strong>{{ result.failed }}</strong></span>
+      </div>
+
+      @if (result.errors.length > 0) {
+        <mat-list class="error-list">
+          @for (err of result.errors; track err) {
+            <mat-list-item>
+              <mat-icon matListItemIcon color="warn">error</mat-icon>
+              <span matListItemTitle>{{ err }}</span>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    </div>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (!result) {
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary"
+            [disabled]="!selectedFile || uploading"
+            (click)="upload()">
+      Upload
+    </button>
+  } @else {
+    <button mat-raised-button color="primary" (click)="done()">Done</button>
+  }
+</mat-dialog-actions>
